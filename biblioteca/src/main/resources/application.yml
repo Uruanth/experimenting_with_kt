@@ -1,0 +1,4 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://perilla174:admin@cluster0.kfyljgn.mongodb.net/nueva
