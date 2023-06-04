@@ -1,3 +1,5 @@
+package Basic
+
 import kotlinx.coroutines.*
 
 fun main(){

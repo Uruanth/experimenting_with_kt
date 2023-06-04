@@ -1,19 +1,21 @@
+package Basic
+
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.concurrent.ConcurrentLinkedQueue
 
 fun main() {
-    val a = LockAndUnlock();
+    val a = Channels();
     a.startProducerAndCosumer();
 }
 
-class LockAndUnlock() {
-
-    private val queue = ConcurrentLinkedQueue<Notes>();
+class Channels() {
+    //Channel puede recibin un arg en su constructor que indica la capacidad que posee
+    private val channel = Channel<Notes2>();
     private var produced = 0;
     private var consumed = 0;
     private var finished = false;
@@ -27,35 +29,32 @@ class LockAndUnlock() {
             launch(Dispatchers.Default) {
                 val producers = List(100_000) {
                     launch {
-                        val note = ChannelsUtil.getRandomNote();
-                        if (queue.offer(note)) {
-                            mutex.withLock {
-                                produced++;
-                            }
+                        val note = ChannelsUtil2.getRandomNote();
+                        channel.send(note);
+                        mutex.withLock {
+                            produced++;
                         }
                     }
                 }
                 producers.joinAll();
+                //TODO no olvidar cerrar los channel, ya que son un buffer
+                channel.close();
                 finished = true;
 
-                println("Producer finished");
+                println("Producer done");
             }
 
             //Consumer
             launch(Dispatchers.Default) {
                 val consumers = List(batch.size) {
                     launch {
-                        while (!finished || queue.isNotEmpty()) {
-                            if (queue.isNotEmpty()) {
-                                val note = queue.poll();
-                                if (note != null) {
-                                    mutex.withLock {
-                                        consumed++;
-                                        batch[it]++;
-                                    }
-                                }
+                        for (note in channel) {
+                            mutex.withLock {
+                                consumed++;
+                                batch[it];
                             }
                         }
+
                     }
                 }
 
@@ -66,7 +65,6 @@ class LockAndUnlock() {
             }
         }
 
-        println("Queue size: ${queue.size}");
         println("Notes produced: $produced")
         println("Notes consumed: $consumed")
 
@@ -79,13 +77,13 @@ class LockAndUnlock() {
 }
 
 
-class ChannelsUtil() {
+class ChannelsUtil2() {
 
     companion object {
 
-        private val notes = Notes.values()
+        private val notes = Notes2.values()
 
-        fun getRandomNote(): Notes {
+        fun getRandomNote(): Notes2 {
 
             val pos = (0..6).random()
 
@@ -97,4 +95,4 @@ class ChannelsUtil() {
 
 }
 
-enum class Notes() { DO, RE, MI, FA, SOL, LA, SI }
+enum class Notes2() { DO, RE, MI, FA, SOL, LA, SI }
