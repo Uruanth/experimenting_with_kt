@@ -6,26 +6,19 @@ fun main() {
 }
 
 //TODO cuando se necesita ejecutar una tarea en segundo plano sin necesidad de retornar un valor
-//Ejemplo: procesos batch
+//TODO Ejemplo: procesos batch
 
 fun myJob() {
     val contries = listOf(
-        "Mexico",
-        "Canada",
-        "Noruega"
+        "Mexico", "Canada", "Noruega"
     )
 
     val colors = listOf(
-        "red",
-        "blue",
-        "green"
+        "red", "blue", "green"
     )
 
     val numbersList = listOf(
-        "one",
-        "two",
-        "three",
-        "four"
+        "one", "two", "three", "four"
     )
 
     val results: LinkedList<String> = LinkedList()
@@ -33,9 +26,9 @@ fun myJob() {
 
     runBlocking {
         withTimeout(50_000) {
-//            TODO Job padre
+            //TODO Job padre, guardar en una variable la couritina de launch
             val jobMaster = launch(CoroutineName("Master")) {
-//                TODO job hijo
+                //TODO job hijo
                 val coutrieJob = launch(CoroutineName("Countries")) {
                     for (c in contries) {
                         results.add(c)
